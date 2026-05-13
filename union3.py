@@ -19,13 +19,6 @@ MENSAJES_ERROR = [
     "Clave incorrecta. No te quedan intentos. Sesion bloqueada."
 ]
 
-#Variable contante de penalizacion por intento
-PENALIZACIONES_INTENTO = [
-    [1, 0,  "Sin penalizacion por primer intento"],
-    [2, 10, "Pierdes 10 puntos por segundo intento"],
-    [3, 30, "Pierdes 30 puntos y se reinicia tu racha"]
-]
-
 #FUNCION QUE GENERA CLAVE 
 def generar_clave():
     numero=random.randint(100000,999999)
@@ -52,9 +45,6 @@ def verificar_clave(clave):
     intentos+=1
     if intentos<=len(MENSAJES_ERROR):
         print(f"   {MENSAJES_ERROR[intentos - 1]}")
-    for n_intentos, puntos, mensaje in PENALIZACIONES_INTENTO:
-        if n_intentos==intentos and puntos>0:
-            print(mensaje)
     return False
 
 #funcion que guarda toda la infromacion de las seciones anteriores
@@ -113,7 +103,7 @@ def temporizador(timer,min,sec,contraseña):
         #Muesta progreso
         #procentaje: 3. largo total del numero inncluyendo punto y decimal, 1: numeros de decimales, f:float
         #flush=true : sirve para que se muestre el progreso y no se muestre ya cuando la barra este al 100,
-        print(f"\rProgreso: |{barra}| {porcentaje:3.1f}% - Faltan: {min}:{sec}", end='', flush=True)
+        print(f"\rProgreso: |{barra}| {porcentaje:3.1f}% - Faltan: {min:02d}:{sec:02d}", end='', flush=True)
         for _ in range(10):
             if intentos<3:
                 if msvcrt.kbhit():
@@ -123,6 +113,7 @@ def temporizador(timer,min,sec,contraseña):
                         clave = input("Introduce la contraseña para salir: ")
                         if clave == contraseña:
                             print("Contraseña correcta. Sesión terminada.")
+                            penalizacion()
                             return
                         else:
                             verificar_clave(clave)
@@ -131,6 +122,7 @@ def temporizador(timer,min,sec,contraseña):
             
         timer -= 1
     print("\n\nTiempo agotado!")
+    return True
 
 
 
@@ -174,26 +166,25 @@ Mmensajes_racha = [
 ]
 
 #puntos , retorna total puntos
-def puntos(minutos):
+def puntos(sec):
     global puntos_totales, racha_actual, racha_maxima, sesiones_ok
-
     #puntos por sesiones completadas
-    match minutos:
-        case 25:
-            puntos_base = 20
-        case 50:
-            puntos_base = 45
-        case 90:
-            puntos_base = 80
-        case 120: 
-            puntos_base = 120
+    match sec:
+        case 1500:
+            puntos_base = 1400
+        case 3000:
+            puntos_base = 2800
+        case 5400:
+            puntos_base = 5200
+        case 7200: 
+            puntos_base = 7000
         case _:
-            puntos_base = minutos-5
+            puntos_base = sec-5
     
     #bonus por racha 
     bonus_racha = 0
     for fila in tabla_puntos:                       
-        if fila[0] == minutos:                      
+        if fila[0] == sec:                      
             if racha_actual >= 7:                   
                 bonus_racha = fila[2] 
 
@@ -208,7 +199,7 @@ def puntos(minutos):
         racha_maxima = racha_actual
 
     #.append: poner otro dato al final de historial_puntos
-    historial_puntos.append([total, True, minutos]) 
+    historial_puntos.append([total, True, sec]) 
 
     print(f"\n   Puntos base:    +{puntos_base}")
     print(f"   Bonus racha:    +{bonus_racha}")
@@ -551,7 +542,7 @@ def menu_principal():
             case 1:
                print("=====SESIONES=====")
                guardian=input("Escribe el nombre de tu guardian: ")
-               menu=int(input("Cuantos minutos quiere estar concentrado\n 1.25 min\n 2.50 min\n 3.90 min \n 4.Personalizar\n"))
+               menu=int(input("Cuantos minutos quiere estar concentrado\n  1. 25 min (+20 pts)\n  2. 50 min (+45 pts)\n  3. 90 min (+80 pts)\n  4. 120 min (+120 pts)\n  5.Personalizar\n"))
 
 #menu con todas las opciones del temporizador dependiendo de lo que escoge el usuario, se rescriben las variables para la funcion temporizador
                match menu:
@@ -564,6 +555,9 @@ def menu_principal():
                         contraseña=iniciar_sesion_clave(timer, guardian)
                         print(contraseña)
                         temporizador(timer,min,sec,contraseña)
+                        if acabo==True:
+                            points=puntos(timer)
+                            print(points)
                     case 2:
                         min=50
                         sec=0
@@ -572,6 +566,9 @@ def menu_principal():
                         sec=timer-(min*60)
                         contraseña=iniciar_sesion_clave(timer, guardian)
                         temporizador(timer,min,sec,contraseña)
+                        if acabo==True:
+                            points=puntos(timer)
+                            print(points)
                     case 3:
                         min=90
                         sec=0
@@ -580,18 +577,42 @@ def menu_principal():
                         sec=timer-(min*60)
                         contraseña=iniciar_sesion_clave(timer, guardian)
                         temporizador(timer,min,sec,contraseña)
+                        if acabo==True:
+                            points=puntos(timer)
+                            print(points)
                     case 4:
+                        min=120
+                        sec=0
+                        timer=min*60+sec
+                        min=timer//60
+                        sec=timer-(min*60)
+                        contraseña=iniciar_sesion_clave(timer, guardian)
+                        temporizador(timer,min,sec,contraseña)
+                        if acabo==True:
+                            points=puntos(timer)
+                            print(points)
+                    case 5:
                         min=int(input("Cuantos minutos quiere estar concentrado?: "))
                         sec=int(input("Cuantos segundos?: "))
                         timer=min*60+sec
                         contraseña=iniciar_sesion_clave(timer, guardian)
                         print(contraseña)
-                        temporizador(timer,min,sec,contraseña)
+                        acabo=temporizador(timer,min,sec,contraseña)
+                        if acabo==True:
+                            points=puntos(timer)
+                            print(points)
 
             case 2:
                print()
             case 3:
-                print()
+                lol=int(input("Quieres ver un resumen o ver tu nivel?: \n  1.Resumen\n  2.Nivel\n"))
+                match lol:
+                    case 1:
+                        resumen_puntos()
+                    case 2:
+                        nivel(puntos_totales)
+                    case _:
+                        print("Opcion invalida, vuelve a intentar")
             case 4:
                 print()
             case 5:
@@ -604,5 +625,4 @@ def menu_principal():
 # Punto de entrada del programa
 if __name__ == "__main__":
     menu_principal()
-    print("Hola mundo")
-    x=3
+    
