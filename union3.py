@@ -36,14 +36,13 @@ def iniciar_sesion_clave(minutos, guardian):
     global clave_activa, tiempo_fin, intentos, guardian_actual
 
     clave_activa=generar_clave() # Genera una clave con la función para la sesion actual
-    tiempo_fin = time.time() + (minutos * 60) # Convierte los minutos a segundos
     intentos = 0 # Reinicia el contador
     guardian_actual=guardian 
 
-    registro: list =[clave_activa, minutos, guardian, time.time()] # Guarda la clave de la sesión, los minutos, el nombre del guardián y la hora actual
+    registro: list =[clave_activa, minutos, guardian] # Guarda la clave de la sesión, los minutos, el nombre del guardián y la hora actual
     historial_claves.append(registro)
     
-    return(clave_activa, tiempo_fin)
+    return(clave_activa)
 
 
 def verificar_clave(clave):
@@ -550,7 +549,8 @@ def menu_principal():
         # SWITCH / MATCH / CASE - una rama por opcion
         match opcion:
             case 1:
-               print("=====TEMPORIZADOR=====")
+               print("=====SESIONES=====")
+               guardian=input("Escribe el nombre de tu guardian: ")
                menu=int(input("Cuantos minutos quiere estar concentrado\n 1.25 min\n 2.50 min\n 3.90 min \n 4.Personalizar\n"))
 
 #menu con todas las opciones del temporizador dependiendo de lo que escoge el usuario, se rescriben las variables para la funcion temporizador
@@ -561,7 +561,7 @@ def menu_principal():
                         timer=min*60+sec
                         min=timer//60
                         sec=timer-(min*60)
-                        contraseña=generar_clave()
+                        contraseña=iniciar_sesion_clave(timer, guardian)
                         print(contraseña)
                         temporizador(timer,min,sec,contraseña)
                     case 2:
@@ -570,7 +570,7 @@ def menu_principal():
                         timer=min*60+sec
                         min=timer//60
                         sec=timer-(min*60)
-                        contraseña=generar_clave()
+                        contraseña=iniciar_sesion_clave(timer, guardian)
                         temporizador(timer,min,sec,contraseña)
                     case 3:
                         min=90
@@ -578,13 +578,13 @@ def menu_principal():
                         timer=min*60+sec
                         min=timer//60
                         sec=timer-(min*60)
-                        contraseña=generar_clave()
+                        contraseña=iniciar_sesion_clave(timer, guardian)
                         temporizador(timer,min,sec,contraseña)
                     case 4:
                         min=int(input("Cuantos minutos quiere estar concentrado?: "))
                         sec=int(input("Cuantos segundos?: "))
                         timer=min*60+sec
-                        contraseña=generar_clave()
+                        contraseña=iniciar_sesion_clave(timer, guardian)
                         print(contraseña)
                         temporizador(timer,min,sec,contraseña)
 
@@ -604,5 +604,3 @@ def menu_principal():
 # Punto de entrada del programa
 if __name__ == "__main__":
     menu_principal()
-print("Soymajo")
-print("HOla")
