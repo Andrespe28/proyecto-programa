@@ -309,22 +309,6 @@ def mensaje_racha(racha):
     if mensaje_actual != "":
         print(f"  {mensaje_actual}")    
 
-def resumen_puntos():
-    nivel = nivel_actual()
-
-    print("\n" + "=" * 42)  
-    print("   RESUMEN DE PUNTOS")
-    print("=" * 42)
-    print(f"   Nivel:            {nivel[3]} {nivel[0]}")
-    print(f"   Puntos totales:   {puntos_totales}")
-    print(f"   Racha actual:     {racha_actual} dias")
-    print(f"   Racha maxima:     {racha_maxima} dias")
-    print(f"   Sesiones ok:      {sesiones_ok}")
-    print(f"   Sesiones fallidas:{sesiones_fallo}")
-    print(f"   Promedio puntos:  {promedio_puntos()}")
-    print(f"   Tasa de exito:    {tasa_exito()}%")
-    print("=" * 42)
-
 
 
 
@@ -344,18 +328,8 @@ matrizdataUsuarios=[
 indice_Activo=1
 #Usuario, minutos, puntos, exitosa True False
 MatrizHistorialSesiones=[] #Matriz vacia que va a ir creciendo
-#App, paquete Android, bloqueadaporDefault True False
-MatrizAppsDisponibles=[["Instagram",  "com.instagram.android",        True],
-                       ["TikTok",     "com.zhiliaoapp.musically",     True],
-                       ["YouTube",    "com.google.android.youtube",   True],
-                       ["WhatsApp",   "com.whatsapp",                 False],
-                       ["Twitter",    "com.twitter.android",          False],
-                       ["Facebook",   "com.facebook.katana",          False],
-                       ["Netflix",    "com.netflix.mediaclient",       False]]
-#Matriz de apps bloqueadas en la sesion actual
-MatrizAppsBloqueadasSesionActual=[] #Matriz vacia que va a ir creciendo
+MatrizRanking=[]
 
-#busca si el usuario creado ya existe
 def buscar_usuario(nombre):
     for i in range(len(matrizdataUsuarios)):
         nombreUsuario= matrizdataUsuarios[i][0]
@@ -364,25 +338,22 @@ def buscar_usuario(nombre):
         
     return -1
 
-
 def registro_sesion(nombre, minutos, puntos, exito):
     global MatrizHistorialSesiones
 
     #Agregar un arreglo de nueva sesion al historialSesiones 
     nueva_sesion=[nombre, minutos, puntos, exito ]
-    #.append : agrega la nueva fila al final
     MatrizHistorialSesiones.append(nueva_sesion)
 
     indice=buscar_usuario(nombre) #Buscar si el usuario existe
 
     if indice==-1: #La funcion buscar_Usuario devuelve un -1, lo que significa que busco en matrizDataUsuarios y no encontro el nombre 
-        nuevoUsuario=[nombre, 0,0,0,0 ]
-        matrizdataUsuarios.append(nuevoUsuario)
-        indice =len(matrizdataUsuarios)-1
+        print("Usuario no encontrado")
+        registro_nuevo_usuario(nombre, 0, 0, 0, 0)
 
     ##Actualizar la fila del usuario en la matrizDataUsuarios (puntos)
     matrizdataUsuarios[indice][1]= matrizdataUsuarios[indice][1] + puntos
-    
+
 
     if exito==True:
         #(racha)
@@ -394,6 +365,10 @@ def registro_sesion(nombre, minutos, puntos, exito):
         matrizdataUsuarios[indice][2]=0
         #(Sesiones Fallidas)
         matrizdataUsuarios[indice][4]=matrizdataUsuarios[indice][4]+ 1
+
+def registro_nuevo_usuario(nombre, puntos, racha, sesiones_ok,sesiones_fallo):
+    nuevo_usuario=[nombre,puntos,racha,sesiones_ok, sesiones_fallo]
+    matrizdataUsuarios.append(nuevo_usuario)
 
 def mostrar_perfil(nombre):
     indice=buscar_usuario(nombre)
@@ -414,20 +389,22 @@ def mostrar_perfil(nombre):
         tasa=(SesionesOkU/totalSesiones)*100 
     
     #Calcular promedio de puntos por sesion exitosa
-  ##  promedio=calcular_promedio_usuario(nombre)
+    promedio=calcular_promedio_usuario(nombre)
 
     #Mostrar al usuario
-    print("\n" + "=" * 42)
-    print(f"Usuario: {NombreU}")
-    print("\n" + "=" * 42)
-    print(f"Puntos totales: {PuntosU}")
-    print(f"Racha actual: {RachaU} dias ")
-    print(f"Sesiones exitosas: {SesionesOkU}")
-    print(f"Sesiones fallidas: {SesionesFallidasU}")
-    print(f"Tasa de exito: {tasa}%")
- ##   print(f"Promedio de puntos por sesion: {promedio} pts")
+    nivel = nivel_actual()
 
-    #Mostrar ultimas 5 sesiones????????
+    print("\n" + "=" * 42)  
+    print("   RESUMEN DE PUNTOS")
+    print("=" * 42)
+    print(f"   Nivel:              {nivel[3]} {nivel[0]}")
+    print(f"   Puntos totales:     {PuntosU}")
+    print(f"   Racha actual:       {RachaU} dias")
+    print(f"   Sesiones ok:        {SesionesOkU}")
+    print(f"   Sesiones fallidas:  {SesionesFallidasU}")
+    print(f"   Promedio puntos:    {promedio}")
+    print(f"   Tasa de exito:      {tasa:3.1f}%")
+    print("=" * 42)
 
 def calcular_promedio_usuario(nombre):
     totalpuntos=0
@@ -441,8 +418,22 @@ def calcular_promedio_usuario(nombre):
         if nombre_s==nombre and Exito_s==True and puntos_s>0:
             totalpuntos=totalpuntos+puntos_s
             ContadorSesiones=ContadorSesiones+1
-    promedio=totalpuntos/ContadorSesiones
-    return promedio
+    if ContadorSesiones==0:
+        return 0.0
+    promedio=totalpuntos / ContadorSesiones
+    return round(promedio,1)
+
+def ranking():
+    matrizRanking =list(matrizdataUsuarios)
+    n=len(matrizRanking)
+    for i in range(n):
+        for j in range(0,n-i-1):
+            if matrizRanking[j][1]< matrizRanking[j+1][1]:
+                matrizRanking[j], matrizRanking[j+1] = matrizRanking[j+1], matrizRanking[j]
+
+    print("Ranking final ")
+    for fila in matrizRanking:
+        print(f"Nombre: {fila[0]: <10} Puntos: {fila[1]}")
 
 
 
@@ -488,12 +479,12 @@ def pedir_nombre_usuario():
     return nombre.strip()                           # RETURN
 
 #Imprime el menu principal con el nombre del usuario
-def mostrar_menu():
+def mostrar_menu(nombre):
     
     print("\n" + "=" * 42)
     print("   GRINDLOCK - Sin distracciones.")
     print("=" * 42)
-    print(f"   Usuario: {nombre_usuario}")
+    print(f"   Usuario: {nombre}")
     print(f"   Sesiones completadas: {sesiones_ok}")
     print("=" * 42)
 
@@ -527,15 +518,23 @@ def menu_principal():
     
     global nombre_usuario
 
-    # Pedir nombre antes de entrar al menu
-    nombre_usuario = pedir_nombre_usuario()
-    print(f"\n   Bienvenido, {nombre_usuario}!")
-
+    nombre=input("Escriba el nombre del usuario:  ")
+    if buscar_usuario(nombre) == -1:
+        print("Usuario no encontrado")
+        print()
+        registro=input("Desea ingresar un nuevo usuario Si/No: ")
+        if registro=="Si":
+            registro_nuevo_usuario(nombre,0,0,0,0)
+        else:
+            print("Deacuerdo, no se hara registro ")
+        print(f"Bienvenido {nombre} Ya puede ver su perfil")
+        mostrar_perfil(nombre)
+        print("=" *42)
     activo= True                             # Variable de control del WHILE
 
     # WHILE principal - se repite hasta que el usuario elija salir
     while activo:
-        mostrar_menu()
+        mostrar_menu(nombre)
         opcion=int(input("Elige tu opcion: "))
         # SWITCH / MATCH / CASE - una rama por opcion
         match opcion:
@@ -608,7 +607,7 @@ def menu_principal():
                 lol=int(input("Quieres ver un resumen o ver tu nivel?: \n  1.Resumen\n  2.Nivel\n"))
                 match lol:
                     case 1:
-                        resumen_puntos()
+                        mostrar_perfil(nombre)
                     case 2:
                         nivel(puntos_totales)
                     case _:
