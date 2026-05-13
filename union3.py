@@ -604,3 +604,4 @@ def menu_principal():
 # Punto de entrada del programa
 if __name__ == "__main__":
     menu_principal()
+    print("Hola mundo")
