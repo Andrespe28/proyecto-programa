@@ -514,114 +514,118 @@ def mostrar_menu_duracion():
 
 
 #Funcion principal: el WHILE que mantiene el programa vivo.
-def menu_principal():
-    
-    global nombre_usuario
 
-    nombre=input("Escriba el nombre del usuario:  ")
-    if buscar_usuario(nombre) == -1:
-        print("Usuario no encontrado")
-        print()
-        registro=input("Desea ingresar un nuevo usuario Si/No: ")
-        if registro=="Si":
-            registro_nuevo_usuario(nombre,0,0,0,0)
-        else:
-            print("Deacuerdo, no se hara registro ")
-        print(f"Bienvenido {nombre} Ya puede ver su perfil")
-        mostrar_perfil(nombre)
-        print("=" *42)
-    activo= True                             # Variable de control del WHILE
+    
+global nombre_usuario
+
+nombre=input("Escriba el nombre del usuario:  ")
+if buscar_usuario(nombre) == -1:
+    print("Usuario no encontrado")
+    print()
+    registro=input("Desea ingresar un nuevo usuario Si/No: ")
+    if registro=="Si":
+        registro_nuevo_usuario(nombre,0,0,0,0)
+    else:
+        print("Deacuerdo, no se hara registro ")
+    print(f"Bienvenido {nombre} Ya puede ver su perfil")
+    mostrar_perfil(nombre)
+    print("=" *42)
+activo= True                             # Variable de control del WHILE
 
     # WHILE principal - se repite hasta que el usuario elija salir
-    while activo:
-        mostrar_menu(nombre)
-        opcion=int(input("Elige tu opcion: "))
+while activo:
+    mostrar_menu(nombre)
+    opcion=int(input("Elige tu opcion: "))
         # SWITCH / MATCH / CASE - una rama por opcion
-        match opcion:
-            case 1:
-               print("=====SESIONES=====")
-               guardian=input("Escribe el nombre de tu guardian: ")
-               menu=int(input("Cuantos minutos quiere estar concentrado\n  1. 25 min (+20 pts)\n  2. 50 min (+45 pts)\n  3. 90 min (+80 pts)\n  4. 120 min (+120 pts)\n  5.Personalizar\n"))
+    match opcion:
+        case 1:
+            print("=====SESIONES=====")
+            guardian=input("Escribe el nombre de tu guardian: ")
+            menu=int(input("Cuantos minutos quiere estar concentrado\n  1. 25 min (+20 pts)\n  2. 50 min (+45 pts)\n  3. 90 min (+80 pts)\n  4. 120 min (+120 pts)\n  5.Personalizar\n"))
 
 #menu con todas las opciones del temporizador dependiendo de lo que escoge el usuario, se rescriben las variables para la funcion temporizador
-               match menu:
-                    case 1:
-                        min=25
-                        sec=0
-                        timer=min*60+sec
-                        min=timer//60
-                        sec=timer-(min*60)
-                        contraseña=iniciar_sesion_clave(timer, guardian)
-                        print(contraseña)
-                        temporizador(timer,min,sec,contraseña)
-                        if acabo==True:
-                            points=puntos(timer)
-                            print(points)
-                    case 2:
-                        min=50
-                        sec=0
-                        timer=min*60+sec
-                        min=timer//60
-                        sec=timer-(min*60)
-                        contraseña=iniciar_sesion_clave(timer, guardian)
-                        temporizador(timer,min,sec,contraseña)
-                        if acabo==True:
-                            points=puntos(timer)
-                            print(points)
-                    case 3:
-                        min=90
-                        sec=0
-                        timer=min*60+sec
-                        min=timer//60
-                        sec=timer-(min*60)
-                        contraseña=iniciar_sesion_clave(timer, guardian)
-                        temporizador(timer,min,sec,contraseña)
-                        if acabo==True:
-                            points=puntos(timer)
-                            print(points)
-                    case 4:
-                        min=120
-                        sec=0
-                        timer=min*60+sec
-                        min=timer//60
-                        sec=timer-(min*60)
-                        contraseña=iniciar_sesion_clave(timer, guardian)
-                        temporizador(timer,min,sec,contraseña)
-                        if acabo==True:
-                            points=puntos(timer)
-                            print(points)
-                    case 5:
-                        min=int(input("Cuantos minutos quiere estar concentrado?: "))
-                        sec=int(input("Cuantos segundos?: "))
-                        timer=min*60+sec
-                        contraseña=iniciar_sesion_clave(timer, guardian)
-                        print(contraseña)
-                        acabo=temporizador(timer,min,sec,contraseña)
-                        if acabo==True:
-                            points=puntos(timer)
-                            print(points)
+            match menu:
+                case 1:
+                    min=25
+                    sec=0
+                    timer=min*60+sec
+                    min=timer//60
+                    sec=timer-(min*60)
+                    contraseña=iniciar_sesion_clave(timer, guardian)
+                    print(contraseña)
+                    temporizador(timer,min,sec,contraseña)
+                    if acabo==True:
+                        points=puntos(timer)
+                        print(points)
+                case 2:
+                    min=50
+                    sec=0
+                    timer=min*60+sec
+                    min=timer//60
+                    sec=timer-(min*60)
+                    contraseña=iniciar_sesion_clave(timer, guardian)
+                    temporizador(timer,min,sec,contraseña)
+                    if acabo==True:
+                        points=puntos(timer)
+                        print(points)
+                case 3:
+                    min=90
+                    sec=0
+                    timer=min*60+sec
+                    min=timer//60
+                    sec=timer-(min*60)
+                    contraseña=iniciar_sesion_clave(timer, guardian)
+                    temporizador(timer,min,sec,contraseña)
+                    if acabo==True:
+                        points=puntos(timer)
+                        print(points)
+                case 4:
+                    min=120
+                    sec=0
+                    timer=min*60+sec
+                    min=timer//60
+                    sec=timer-(min*60)
+                    contraseña=iniciar_sesion_clave(timer, guardian)
+                    temporizador(timer,min,sec,contraseña)
+                    if acabo==True:
+                        points=puntos(timer)
+                        print(points)
+                case 5:
+                    min=int(input("Cuantos minutos quiere estar concentrado?: "))
+                    sec=int(input("Cuantos segundos?: "))
+                    timer=min*60+sec
+                    contraseña=iniciar_sesion_clave(timer, guardian)
+                    print(contraseña)
+                    acabo=temporizador(timer,min,sec,contraseña)
+                    if acabo==True:
+                        points=puntos(timer)
+                        print(points)
 
-            case 2:
-               print()
-            case 3:
-                lol=int(input("Quieres ver un resumen o ver tu nivel?: \n  1.Resumen\n  2.Nivel\n"))
-                match lol:
-                    case 1:
-                        mostrar_perfil(nombre)
-                    case 2:
-                        nivel(puntos_totales)
-                    case _:
-                        print("Opcion invalida, vuelve a intentar")
-            case 4:
+        case 2:
+            ranking()
+        case 3:
+            lol=int(input("Quieres ver un resumen o ver tu nivel?: \n  1.Resumen\n  2.Nivel\n"))
+            match lol:
+                case 1:
+                    mostrar_perfil(nombre)
+                case 2:
+                    nivel(puntos_totales)
+                case _:
+                    print("Opcion invalida, vuelve a intentar")
+        case 4:
+            nombre=input("Escriba el nombr del usuario: ")
+            if buscar_usuario(nombre) == -1:
+                print("Usuario no encontrado")
                 print()
-            case 5:
-                activo = False                      # Sale del WHILE
-                print("\n   Hasta la proxima sesion. Sigue enfocado!")
-            case _:
-                print("   Opcion invalida. Intenta de nuevo.")
+            registro=input("Desea ingresar un nuevo usuario Si/No: ")
+            if registro=="Si":
+                registro_nuevo_usuario(nombre,0,0,0,0)
+            else:
+                print("Deacuerdo, no se hara registro ")
+        case 5:
+            activo = False                      # Sale del WHILE
+            print("\n   Hasta la proxima sesion. Sigue enfocado!")
+        case _:
+            print("   Opcion invalida. Intenta de nuevo.")
 
-
-# Punto de entrada del programa
-if __name__ == "__main__":
-    menu_principal()
     
