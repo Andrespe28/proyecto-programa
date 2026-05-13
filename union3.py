@@ -3,7 +3,7 @@
 import random
 import time
 import msvcrt
- 
+hola="x"
 clave_activa = ""     # Clave que se genera en cada sesión
 tiempo_fin = 0.0    # Tiempo cuando se termina la sesión
 intentos= 0      # Contador del número de intentos que lleva el usuario ingresando la clave.
