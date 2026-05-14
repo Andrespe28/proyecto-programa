@@ -3,7 +3,7 @@
 import random
 import time
 import msvcrt
-hola="x"
+
 clave_activa = ""     # Clave que se genera en cada sesión
 tiempo_fin = 0.0    # Tiempo cuando se termina la sesión
 intentos= 0      # Contador del número de intentos que lleva el usuario ingresando la clave.
@@ -39,7 +39,7 @@ def iniciar_sesion_clave(minutos, guardian):
 
 
 def verificar_clave(clave):
-    global intentos
+    global intentos#M Revisar 
     if len(clave)!=6:
         return False
     intentos+=1
@@ -48,7 +48,7 @@ def verificar_clave(clave):
     return False
 
 #funcion que guarda toda la infromacion de las seciones anteriores
-def mostrar_historial_claves():
+def mostrar_historial_claves(): #M No es necesaria
     print("\n   Historial de sesiones:")
     print("   " + "-" * 36)
     if len(historial_claves)==0:
@@ -65,8 +65,8 @@ def mostrar_historial_claves():
     print("   " + "-" * 36)
 
 #funcion que dice el total de sesiones realizadas
-def obtener_total_sesiones()->int:
-    return(len(historial_claves))   
+def obtener_total_sesiones(): #M No se usa 
+    return(len(historial_claves)) 
 
 ###### temporizador#####
 def temporizador(timer,min,sec,contraseña):
@@ -167,7 +167,7 @@ Mmensajes_racha = [
 
 #puntos , retorna total puntos
 def puntos(sec):
-    global puntos_totales, racha_actual, racha_maxima, sesiones_ok
+    global puntos_totales, racha_actual, racha_maxima, sesiones_ok #M Revisar si las variables globales van fuera de la función
     #puntos por sesiones completadas
     match sec:
         case 1500:
@@ -213,7 +213,7 @@ def puntos(sec):
 
 
 def penalizacion():
-    global puntos_totales, racha_actual, sesiones_fallo
+    global puntos_totales, racha_actual, sesiones_fallo #M Revisar si la variable global va afuera
 
     penalizacion = puntos_totales // 10 
 
@@ -251,7 +251,7 @@ def nivel_actual():
     return nivel_encontrado
 
 
-def nivel(puntos_nuevos):
+def nivel(puntos_nuevos):#M No se usa la variable del parámetro
     nivel = nivel_actual()
     nombre = nivel[0]
     pts_max = nivel[2]
@@ -339,7 +339,7 @@ def buscar_usuario(nombre):
     return -1
 
 def registro_sesion(nombre, minutos, puntos, exito):
-    global MatrizHistorialSesiones
+    global MatrizHistorialSesiones#M Revisar si esta matriz va dentro de esta funcion
 
     #Agregar un arreglo de nueva sesion al historialSesiones 
     nueva_sesion=[nombre, minutos, puntos, exito ]
@@ -455,7 +455,8 @@ MODOS_SESION: list = ["Normal", "Examen", "Pomodoro"]
 
 # Matriz con duraciones y sus puntos base
 # Cada fila es: [duracion_minutos, puntos_base, descripcion]
-DURACIONES: list = [
+
+DURACIONES: list = [ #M Esta matriz no se usa, está en la función mostrar_menu_duracion
     [25,  20,  "Pomodoro basico"],
     [50,  45,  "Sesion media   "],
     [90,  80,  "Sesion estandar"],
@@ -495,7 +496,8 @@ def mostrar_menu(nombre):
     print("=" * 42)
 
 #Muestra las opciones de duracion con sus puntos.
-def mostrar_menu_duracion():
+
+def mostrar_menu_duracion(): #M Esta función no la usamos
     
     print("\n   Elige la duracion de tu sesion:")
     print("   " + "-" * 34)
@@ -613,7 +615,7 @@ while activo:
                 case _:
                     print("Opcion invalida, vuelve a intentar")
         case 4:
-            nombre=input("Escriba el nombr del usuario: ")
+            nombre=input("Escriba el nombre del usuario: ")
             if buscar_usuario(nombre) == -1:
                 print("Usuario no encontrado")
                 print()
