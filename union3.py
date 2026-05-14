@@ -127,8 +127,7 @@ def temporizador(timer,min,sec,contraseña):
 
 
 
-
-
+#####Puntos###########
 puntos_totales = 0
 racha_actual = 0
 racha_maxima = 0
@@ -314,8 +313,6 @@ def mensaje_racha(racha):
 
 
 #####usuarioo####
-print("\n" + "=" * 42)
-print(" Modulo Usuarios ")
 
 #Matriz de usuarios registrados.
 #  Usuarios, puntos, racha, sesiones_ok, sesiones_fallo
@@ -481,12 +478,13 @@ def pedir_nombre_usuario():
 
 #Imprime el menu principal con el nombre del usuario
 def mostrar_menu(nombre):
-    
+    indice=buscar_usuario(nombre)
     print("\n" + "=" * 42)
     print("   GRINDLOCK - Sin distracciones.")
     print("=" * 42)
-    print(f"   Usuario: {nombre}")
-    print(f"   Sesiones completadas: {sesiones_ok}")
+    if indice!=-1:
+        print(f"   Usuario: {nombre}")
+        print(f"   Sesiones completadas: {sesiones_ok}")
     print("=" * 42)
 
     # FOR: recorre el arreglo de opciones para mostrarlas
@@ -519,7 +517,19 @@ def mostrar_menu_duracion(): #M Esta función no la usamos
 
     
 global nombre_usuario
+##MatrizDataUsuarios 
+print("\n" + "=" * 42)
+print("   Bienvenido a GRINDLOCK")
+print("=" * 42)
+print(f"{'USUARIO':<12} {'PUNTOS':<12} {'RACHA':<12} {'SES. OK':<12} {'SES. FALLO':<12}")
 
+for i in range(len(matrizdataUsuarios)):
+    for j in range(len(matrizdataUsuarios[i])):
+        print(f"{matrizdataUsuarios[i][j]:<12}", end=" ")
+    print()
+print("="*42)
+
+print("INICIAR SESION")
 nombre=input("Escriba el nombre del usuario:  ")
 if buscar_usuario(nombre) == -1:
     print("Usuario no encontrado")
@@ -527,11 +537,11 @@ if buscar_usuario(nombre) == -1:
     registro=input("Desea ingresar un nuevo usuario Si/No: ")
     if registro=="Si":
         registro_nuevo_usuario(nombre,0,0,0,0)
+        print(f"Registro exitoso {nombre}")
     else:
         print("Deacuerdo, no se hara registro ")
-    print(f"Bienvenido {nombre} Ya puede ver su perfil")
-    mostrar_perfil(nombre)
-    print("=" *42)
+
+
 activo= True                             # Variable de control del WHILE
 
     # WHILE principal - se repite hasta que el usuario elija salir
@@ -559,6 +569,8 @@ while activo:
                     if acabo==True:
                         points=puntos(timer)
                         print(points)
+                        registro_sesion(nombre,min,puntos,0)
+                        print(MatrizHistorialSesiones)
                 case 2:
                     min=50
                     sec=0
@@ -619,11 +631,23 @@ while activo:
             if buscar_usuario(nombre) == -1:
                 print("Usuario no encontrado")
                 print()
-            registro=input("Desea ingresar un nuevo usuario Si/No: ")
-            if registro=="Si":
-                registro_nuevo_usuario(nombre,0,0,0,0)
-            else:
-                print("Deacuerdo, no se hara registro ")
+                registro=input("Desea ingresar un nuevo usuario Si/No: ")
+                if registro=="Si":
+                    registro_nuevo_usuario(nombre,0,0,0,0)
+                else:
+                    print("Deacuerdo, no se hara registro ")
+            if buscar_usuario(nombre)!=-1:
+                print(f"Deacuerdo bienvenido {nombre}")
+                mostrar=input("Desea ver la matriz de usuarios Si/No \n Opcion: ")
+                if mostrar=="Si":
+                    print(f"{'USUARIO':<12} {'PUNTOS':<12} {'RACHA':<12} {'SES. OK':<12} {'SES. FALLO':<12}")
+                    for i in range(len(matrizdataUsuarios)):
+                        for j in range(len(matrizdataUsuarios[i])):
+                            print(f"{matrizdataUsuarios[i][j]:<12}", end=" ")
+                        print()
+                    print("="*42)
+
+                
         case 5:
             activo = False                      # Sale del WHILE
             print("\n   Hasta la proxima sesion. Sigue enfocado!")
