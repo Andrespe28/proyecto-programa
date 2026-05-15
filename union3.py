@@ -32,14 +32,14 @@ def iniciar_sesion_clave(minutos, guardian):
     intentos = 0 # Reinicia el contador
     guardian_actual=guardian 
 
-    registro: list =[clave_activa, minutos, guardian] # Guarda la clave de la sesión, los minutos, el nombre del guardián y la hora actual
+    registro =[clave_activa, minutos, guardian] # Guarda la clave de la sesión, los minutos, el nombre del guardián y la hora actual
     historial_claves.append(registro)
     
     return(clave_activa)
 
 
 def verificar_clave(clave):
-    global intentos#M Revisar 
+    global intentos #M Revisar 
     if len(clave)!=6:
         return False
     intentos+=1
@@ -47,33 +47,13 @@ def verificar_clave(clave):
         print(f"   {MENSAJES_ERROR[intentos - 1]}")
     return False
 
-#funcion que guarda toda la infromacion de las seciones anteriores
-def mostrar_historial_claves(): #M No es necesaria
-    print("\n   Historial de sesiones:")
-    print("   " + "-" * 36)
-    if len(historial_claves)==0:
-        print(" No hay sesiones registradas.")
-        return
-    else:
-        for i in range (len(historial_claves)):
-            sesion: list = historial_claves[i]
-            clave_historial: int = sesion[0]
-            minutos_historial: int = sesion[1]
-            guardian_historial: str = sesion[2]
-            print(f"   Sesion {i + 1}: {minutos_historial} min | Guardian: {guardian_historial}")
-
-    print("   " + "-" * 36)
-
-#funcion que dice el total de sesiones realizadas
-def obtener_total_sesiones(): #M No se usa 
-    return(len(historial_claves)) 
 
 ###### temporizador#####
-def temporizador(timer,min,sec,contraseña):
+def temporizador(timer,min,sec,contraseña,nombre):
     Frases=["Empezando. Tu guardian tiene la clave","Buen comienzo! Ya completaste el 25%.","A la mitad! Sigue asi.","Casi listo! Solo falta el 25%.","Ultimo tramo! No pares ahora.","Sesion completada. Excelente trabajo!"]
     inicio=timer
     print("\nPresiona 'ESC' para salir e ingresar contraseña...")
-    intento=0
+
     while timer>=0:
         #cuantos minutos
         min=timer//60
@@ -113,11 +93,11 @@ def temporizador(timer,min,sec,contraseña):
                         clave = input("Introduce la contraseña para salir: ")
                         if clave == contraseña:
                             print("Contraseña correcta. Sesión terminada.")
-                            penalizacion()
+                            penalizacion(nombre)
                             return
                         else:
                             verificar_clave(clave)
-                            intento=intento+1
+        
             time.sleep(0.1) 
             
         timer -= 1
@@ -128,12 +108,6 @@ def temporizador(timer,min,sec,contraseña):
 
 
 #####Puntos###########
-puntos_totales = 0
-racha_actual = 0
-racha_maxima = 0
-sesiones_ok = 0
-sesiones_fallo = 0
-
 #matriz que va aumentando
 historial_puntos = []
 
@@ -165,8 +139,12 @@ Mmensajes_racha = [
 ]
 
 #puntos , retorna total puntos
-def puntos(sec):
-    global puntos_totales, racha_actual, racha_maxima, sesiones_ok #M Revisar si las variables globales van fuera de la función
+def puntos(sec,nombre):
+    indice=buscar_usuario(nombre)
+    if indice==-1:
+        return 0
+    puntos_actuales = matrizdataUsuarios[indice][1]
+    racha_actual = matrizdataUsuarios[indice][2]
     #puntos por sesiones completadas
     match sec:
         case 1500:
@@ -189,13 +167,6 @@ def puntos(sec):
 
     total = puntos_base + bonus_racha
 
-    puntos_totales = puntos_totales + total
-    racha_actual += 1
-    sesiones_ok += 1
-
-    #racha maxima es la racha actual
-    if racha_actual > racha_maxima:
-        racha_maxima = racha_actual
 
     #.append: poner otro dato al final de historial_puntos
     historial_puntos.append([total, True, sec]) 
@@ -203,114 +174,75 @@ def puntos(sec):
     print(f"\n   Puntos base:    +{puntos_base}")
     print(f"   Bonus racha:    +{bonus_racha}")
     print(f"   Total ganado:   +{total}")
-    print(f"   Total acumulado: {puntos_totales}")
-    print(f"   Racha actual:    {racha_actual} dias")
-
-    mensaje_racha(racha_actual)   
+    print(f"   Total acumulado: {total}")
+    print(f"   Racha actual:    {racha_actual} dias")   
 
     return total  
 
 
 def penalizacion():
-    global puntos_totales, racha_actual, sesiones_fallo #M Revisar si la variable global va afuera
+    indice = buscar_usuario(nombre)
+    if indice == -1: return 0
 
-    penalizacion = puntos_totales // 10 
+    puntos_actuales = matrizdataUsuarios[indice][1]
+    penalizacion = puntos_actuales // 10
 
     if penalizacion < 10: 
         penalizacion = 10
     if penalizacion > 50:
         penalizacion= 50
 
-    if penalizacion > puntos_totales:
-        penalizacion = puntos_totales
-
-    puntos_totales = puntos_totales - penalizacion
-    racha_actual = 0
-    sesiones_fallo += 1
+    if penalizacion > puntos_actuales:
+        penalizacion = puntos_actuales
 
     historial_puntos.append([-penalizacion, False, 0]) 
 
     print(f"\n   Penalizacion:    -{penalizacion} puntos")
-    print(f"   Puntos totales:  {puntos_totales}")
+    print(f"   Puntos totales:  {matrizdataUsuarios[indice][1]}")
     print(f"   Racha reiniciada a 0.")
 
     return penalizacion                             
 
 
-def nivel_actual(): 
+def nivel_actual(nombre): 
+    indice = buscar_usuario(nombre)
+    puntos_u = matrizdataUsuarios[indice][1]
+    if indice != -1:
+        puntos_u = matrizdataUsuarios[indice][1]  # Si existe, toma sus puntos reales
+    else:
+        puntos_u = 0                              # Si no existe, ponle 0 puntos
     nivel_encontrado = niveles[0]
 
-    for fila in niveles: 
-        pts_min = fila[1]
-        pts_max = fila[2]
-
-        if puntos_totales >= pts_min and puntos_totales <= pts_max:
+    for fila in niveles:
+        if puntos_u >= fila[1] and puntos_u <= fila[2]:
             nivel_encontrado = fila
             break
     return nivel_encontrado
 
 
-def nivel(puntos_nuevos):#M No se usa la variable del parámetro
-    nivel = nivel_actual()
-    nombre = nivel[0]
+def nivel(nombre):
+    indice = buscar_usuario(nombre)
+    if indice == -1: return
+    puntos_u = matrizdataUsuarios[indice][1]
+    nivel = nivel_actual(nombre)
+    nombre_nivel = nivel[0]
     pts_max = nivel[2]
     emoji = nivel[3]
 
-    falta = pts_max - puntos_totales
+    falta = pts_max - puntos_u
 
-    print(f"\n   {emoji} Nivel actual: {nombre}")
-    print(f"   Puntos: {puntos_totales} | Faltan {falta} para el siguiente nivel")
+    print(f"\n   {emoji} Nivel actual: {nombre_nivel}")
+    print(f"   Puntos: {puntos_u} | Faltan {falta} para el siguiente nivel")
 
 
-def promedio_puntos(): 
-    if len(historial_puntos) == 0: 
-        return 0.0
-    
-    total_pts = 0
-    sesiones_contadas = 0
-
-    for entrada in historial_puntos:
-        pts = entrada[0]
-        existosa = entrada[1]
-
-        if existosa and pts > 0:
-            total_pts = total_pts + pts
-            sesiones_contadas += 1
-
-    if sesiones_contadas == 0:
-        return 0.0
-    
-    promedio = total_pts / sesiones_contadas
-    return round(promedio, 2) 
-
-def tasa_exito():
-    total = len(historial_puntos)
-    if total == 0:
-        return 0.0
-    
-    exitosas = 0
-    for entrada in historial_puntos: 
-        if entrada[1]:
-            exitosas +=1
-    
-    tasa = (exitosas / total) * 100
-    return round(tasa, 1)
 
 def mensaje_racha(racha):
     mensaje_actual = ""
     for item in Mmensajes_racha: 
-        umbral = item[0]
-        mensaje = item[1]
-
-        if racha >= umbral:
-            mensaje_actual = mensaje
-
+        if racha >= item[0]:
+            mensaje_actual = item[1]
     if mensaje_actual != "":
-        print(f"  {mensaje_actual}")    
-
-
-
-
+        print(f"  {mensaje_actual}")
 
 #####usuarioo####
 
@@ -322,22 +254,21 @@ matrizdataUsuarios=[
     ["Valeria", 280, 5, 9, 3],
     ["Camilo", 195, 3, 7 , 4],
     ["Maria J", 120, 1, 4, 5]]
-indice_Activo=1
+
 #Usuario, minutos, puntos, exitosa True False
 MatrizHistorialSesiones=[] #Matriz vacia que va a ir creciendo
-MatrizRanking=[]
+
 
 def buscar_usuario(nombre):
     for i in range(len(matrizdataUsuarios)):
         nombreUsuario= matrizdataUsuarios[i][0]
-        if nombreUsuario==nombre:
+        if nombreUsuario.lower()==nombre.lower():
             return i
         
     return -1
 
 def registro_sesion(nombre, minutos, puntos, exito):
-    global MatrizHistorialSesiones#M Revisar si esta matriz va dentro de esta funcion
-
+    
     #Agregar un arreglo de nueva sesion al historialSesiones 
     nueva_sesion=[nombre, minutos, puntos, exito ]
     MatrizHistorialSesiones.append(nueva_sesion)
@@ -357,11 +288,14 @@ def registro_sesion(nombre, minutos, puntos, exito):
         matrizdataUsuarios[indice][2]=matrizdataUsuarios[indice][2]+ 1
         #(Sesiones ok)
         matrizdataUsuarios[indice][3]=matrizdataUsuarios[indice][3]+ 1
+        #Mensaje racha
+        mensaje_racha(matrizdataUsuarios[indice][2])
     else:
         #(Reinciar racha)
         matrizdataUsuarios[indice][2]=0
         #(Sesiones Fallidas)
         matrizdataUsuarios[indice][4]=matrizdataUsuarios[indice][4]+ 1
+
 
 def registro_nuevo_usuario(nombre, puntos, racha, sesiones_ok,sesiones_fallo):
     nuevo_usuario=[nombre,puntos,racha,sesiones_ok, sesiones_fallo]
@@ -381,15 +315,22 @@ def mostrar_perfil(nombre):
 
     #Calculo de la tasa de exito
     totalSesiones= SesionesOkU+SesionesFallidasU
-    tasa=0.0
     if totalSesiones>0:
         tasa=(SesionesOkU/totalSesiones)*100 
-    
-    #Calcular promedio de puntos por sesion exitosa
-    promedio=calcular_promedio_usuario(nombre)
+    else:
+        tasa=0.0
+    #promedio local usuario
+    #Mirar
+    totalpuntos = 0
+    ContadorSesiones = 0
+    for sesion in MatrizHistorialSesiones:
+        if sesion[0].lower() == nombre.lower() and sesion[3] and sesion[2] > 0:
+            totalpuntos += sesion[2]
+            ContadorSesiones += 1
+    promedio = round(totalpuntos / ContadorSesiones, 1) if ContadorSesiones > 0 else 0.0
 
     #Mostrar al usuario
-    nivel = nivel_actual()
+    nivel = nivel_actual(nombre)
 
     print("\n" + "=" * 42)  
     print("   RESUMEN DE PUNTOS")
@@ -403,22 +344,6 @@ def mostrar_perfil(nombre):
     print(f"   Tasa de exito:      {tasa:3.1f}%")
     print("=" * 42)
 
-def calcular_promedio_usuario(nombre):
-    totalpuntos=0
-    ContadorSesiones=0
-    for i in range(len(MatrizHistorialSesiones)):
-        sesion=MatrizHistorialSesiones[i]
-        nombre_s=sesion[0]
-        puntos_s=sesion[2]
-        Exito_s=sesion[3]
-
-        if nombre_s==nombre and Exito_s==True and puntos_s>0:
-            totalpuntos=totalpuntos+puntos_s
-            ContadorSesiones=ContadorSesiones+1
-    if ContadorSesiones==0:
-        return 0.0
-    promedio=totalpuntos / ContadorSesiones
-    return round(promedio,1)
 
 def ranking():
     matrizRanking =list(matrizdataUsuarios)
@@ -430,7 +355,7 @@ def ranking():
 
     print("Ranking final ")
     for fila in matrizRanking:
-        print(f"Nombre: {fila[0]: <10} Puntos: {fila[1]}")
+        print(f"Nombre: {fila[0]: <12} Puntos: {fila[1]}")
 
 
 
@@ -439,7 +364,7 @@ def ranking():
 
 
 # Arreglo con las opciones del menu principal
-OPCIONES_MENU: list = [
+OPCIONES_MENU= [
     "1. Iniciar sesion de enfoque",
     "2. Ver ranking semanal",
     "3. Ver mi perfil",
@@ -447,34 +372,7 @@ OPCIONES_MENU: list = [
     "5. Salir"
 ]
 
-# Arreglo con los modos de sesion disponibles
-MODOS_SESION: list = ["Normal", "Examen", "Pomodoro"]
 
-# Matriz con duraciones y sus puntos base
-# Cada fila es: [duracion_minutos, puntos_base, descripcion]
-
-DURACIONES: list = [ #M Esta matriz no se usa, está en la función mostrar_menu_duracion
-    [25,  20,  "Pomodoro basico"],
-    [50,  45,  "Sesion media   "],
-    [90,  80,  "Sesion estandar"],
-    [120, 120, "Sesion extendida"]
-]
-
-
-
-#Pide el nombre del usuario al iniciar el programa.
-def pedir_nombre_usuario():
-    
-    print("\n" + "=" * 42)
-    print("   Bienvenido a GRINDLOCK")
-    print("=" * 42)
-    nombre = input("   Ingresa tu nombre: ")
-
-    # Validacion basica: si esta vacio, poner nombre por defecto
-    if nombre.strip() == "":                        # OPERADORES: comparacion
-        nombre = "Estudiante"
-
-    return nombre.strip()                           # RETURN
 
 #Imprime el menu principal con el nombre del usuario
 def mostrar_menu(nombre):
@@ -483,8 +381,8 @@ def mostrar_menu(nombre):
     print("   GRINDLOCK - Sin distracciones.")
     print("=" * 42)
     if indice!=-1:
-        print(f"   Usuario: {nombre}")
-        print(f"   Sesiones completadas: {sesiones_ok}")
+        print(f"   Usuario actual: {matrizdataUsuarios[indice][0]}")
+        print(f"   Sesiones completadas: {matrizdataUsuarios[indice][3]}")
     print("=" * 42)
 
     # FOR: recorre el arreglo de opciones para mostrarlas
@@ -493,30 +391,9 @@ def mostrar_menu(nombre):
 
     print("=" * 42)
 
-#Muestra las opciones de duracion con sus puntos.
-
-def mostrar_menu_duracion(): #M Esta función no la usamos
-    
-    print("\n   Elige la duracion de tu sesion:")
-    print("   " + "-" * 34)
-
-    # FOR con indice sobre la MATRIZ de duraciones
-    for i in range(len(DURACIONES)):
-        fila = DURACIONES[i]                        # Acceso a fila de la matriz
-        duracion: int = fila[0]                     # Columna 0: minutos
-        puntos: int   = fila[1]                     # Columna 1: puntos
-        desc: str     = fila[2]                     # Columna 2: descripcion
-        print(f"   {i + 1}. {desc}  -  {duracion} min  (+{puntos} pts)")
-
-    print("   " + "-" * 34)
-
-
-
 
 #Funcion principal: el WHILE que mantiene el programa vivo.
 
-    
-global nombre_usuario
 ##MatrizDataUsuarios 
 print("\n" + "=" * 42)
 print("   Bienvenido a GRINDLOCK")
@@ -535,7 +412,7 @@ if buscar_usuario(nombre) == -1:
     print("Usuario no encontrado")
     print()
     registro=input("Desea ingresar un nuevo usuario Si/No: ")
-    if registro=="Si":
+    if registro=="Si" or registro=="si":
         registro_nuevo_usuario(nombre,0,0,0,0)
         print(f"Registro exitoso {nombre}")
     else:
@@ -565,12 +442,11 @@ while activo:
                     sec=timer-(min*60)
                     contraseña=iniciar_sesion_clave(timer, guardian)
                     print(contraseña)
-                    temporizador(timer,min,sec,contraseña)
+                    acabo = temporizador(timer, min, sec, contraseña, nombre)
                     if acabo==True:
                         points=puntos(timer)
-                        print(points)
                         registro_sesion(nombre,min,puntos,0)
-                        print(MatrizHistorialSesiones)
+                        
                 case 2:
                     min=50
                     sec=0
@@ -578,10 +454,9 @@ while activo:
                     min=timer//60
                     sec=timer-(min*60)
                     contraseña=iniciar_sesion_clave(timer, guardian)
-                    temporizador(timer,min,sec,contraseña)
+                    acabo = temporizador(timer, min, sec, contraseña, nombre)
                     if acabo==True:
                         points=puntos(timer)
-                        print(points)
                 case 3:
                     min=90
                     sec=0
@@ -589,10 +464,9 @@ while activo:
                     min=timer//60
                     sec=timer-(min*60)
                     contraseña=iniciar_sesion_clave(timer, guardian)
-                    temporizador(timer,min,sec,contraseña)
+                    acabo = temporizador(timer, min, sec, contraseña, nombre)
                     if acabo==True:
                         points=puntos(timer)
-                        print(points)
                 case 4:
                     min=120
                     sec=0
@@ -600,20 +474,20 @@ while activo:
                     min=timer//60
                     sec=timer-(min*60)
                     contraseña=iniciar_sesion_clave(timer, guardian)
-                    temporizador(timer,min,sec,contraseña)
+                    acabo = temporizador(timer, min, sec, contraseña, nombre)
                     if acabo==True:
                         points=puntos(timer)
-                        print(points)
                 case 5:
                     min=int(input("Cuantos minutos quiere estar concentrado?: "))
                     sec=int(input("Cuantos segundos?: "))
                     timer=min*60+sec
                     contraseña=iniciar_sesion_clave(timer, guardian)
                     print(contraseña)
-                    acabo=temporizador(timer,min,sec,contraseña)
-                    if acabo==True:
-                        points=puntos(timer)
-                        print(points)
+                    acabo = temporizador(timer, min, sec, contraseña, nombre)
+                    if acabo:
+                        points = puntos(timer, nombre)
+                        registro_sesion(nombre, min, points, True)
+
 
         case 2:
             ranking()
@@ -623,7 +497,7 @@ while activo:
                 case 1:
                     mostrar_perfil(nombre)
                 case 2:
-                    nivel(puntos_totales)
+                    nivel(nombre)
                 case _:
                     print("Opcion invalida, vuelve a intentar")
         case 4:
@@ -632,14 +506,14 @@ while activo:
                 print("Usuario no encontrado")
                 print()
                 registro=input("Desea ingresar un nuevo usuario Si/No: ")
-                if registro=="Si":
+                if registro.lower()=="Si":
                     registro_nuevo_usuario(nombre,0,0,0,0)
                 else:
-                    print("Deacuerdo, no se hara registro ")
+                    print(f"Bienvenido de vuelta {nombre} ")
             if buscar_usuario(nombre)!=-1:
                 print(f"Deacuerdo bienvenido {nombre}")
                 mostrar=input("Desea ver la matriz de usuarios Si/No \n Opcion: ")
-                if mostrar=="Si":
+                if mostrar=="Si"or mostrar=="si":
                     print(f"{'USUARIO':<12} {'PUNTOS':<12} {'RACHA':<12} {'SES. OK':<12} {'SES. FALLO':<12}")
                     for i in range(len(matrizdataUsuarios)):
                         for j in range(len(matrizdataUsuarios[i])):
