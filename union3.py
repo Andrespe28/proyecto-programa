@@ -4,14 +4,7 @@ import random
 import time
 import msvcrt
 
-clave_activa = ""     # Clave que se genera en cada sesión
-tiempo_fin = 0.0    # Tiempo cuando se termina la sesión
-intentos= 0      # Contador del número de intentos que lleva el usuario ingresando la clave.
-MAX_INTENTOS= 3      # Límite de intentos permitidos -> Constante
-guardian_actual= ""     # Nombre del amigo guardián
-
-historial_claves=[]       # Matriz que guarda el historial de cada sesión: clave, tiempo, amigo guardián.
-
+intentos=0
 #Variable contante de intentos
 MENSAJES_ERROR = [
     "Clave incorrecta. Te quedan 2 intentos.",
@@ -25,21 +18,8 @@ def generar_clave():
     clave=str(numero)
     return clave
 
-def iniciar_sesion_clave(minutos, guardian):
-    global clave_activa, tiempo_fin, intentos, guardian_actual
-
-    clave_activa=generar_clave() # Genera una clave con la función para la sesion actual
-    intentos = 0 # Reinicia el contador
-    guardian_actual=guardian 
-
-    registro =[clave_activa, minutos, guardian] # Guarda la clave de la sesión, los minutos, el nombre del guardián y la hora actual
-    historial_claves.append(registro)
-    
-    return(clave_activa)
-
-
-def verificar_clave(clave):
-    global intentos #M Revisar 
+def verificar_clave(clave): 
+    global intentos
     if len(clave)!=6:
         return False
     intentos+=1
@@ -49,10 +29,11 @@ def verificar_clave(clave):
 
 
 ###### temporizador#####
-def temporizador(timer,min,sec,contraseña,nombre):
+def temporizador(timer,contraseña,nombre):
     Frases=["Empezando. Tu guardian tiene la clave","Buen comienzo! Ya completaste el 25%.","A la mitad! Sigue asi.","Casi listo! Solo falta el 25%.","Ultimo tramo! No pares ahora.","Sesion completada. Excelente trabajo!"]
     inicio=timer
     print("\nPresiona 'ESC' para salir e ingresar contraseña...")
+    intentos=0
 
     while timer>=0:
         #cuantos minutos
@@ -67,15 +48,15 @@ def temporizador(timer,min,sec,contraseña,nombre):
         porcentaje=progreso*100
 
         #Frases de motivacion en cada momento de la sesion
-        if porcentaje>=0 and porcentaje<1:
+        if porcentaje==0 :
             print(f"\r{Frases[0]}                                        ")
-        elif porcentaje>=25 and porcentaje<26:
+        elif porcentaje==25:
            print(f"\r{Frases[1]}                                         ") 
-        elif porcentaje>=50 and porcentaje<=51:
+        elif porcentaje==50:
            print(f"\r{Frases[2]}                                         ") 
-        elif porcentaje>=75 and porcentaje<=76:
+        elif porcentaje==75:
            print(f"\r{Frases[3]}                                         ") 
-        elif porcentaje>=90 and porcentaje<=91:
+        elif porcentaje==90:
            print(f"\r{Frases[4]}                                         ") 
         elif porcentaje==100:
            print(f"\r{Frases[5]}                                         ") 
@@ -109,7 +90,6 @@ def temporizador(timer,min,sec,contraseña,nombre):
 
 #####Puntos###########
 #matriz que va aumentando
-historial_puntos = []
 
 #matriz con niveles dependiendo de cantidad de puntos
 niveles = [
@@ -157,30 +137,19 @@ def puntos(sec,nombre):
             puntos_base = 7000
         case _:
             puntos_base = sec-5
-    
-    #bonus por racha 
-    bonus_racha = 0
-    for fila in tabla_puntos:                       
-        if fila[0] == sec:                      
-            if racha_actual >= 7:                   
-                bonus_racha = fila[2] 
 
-    total = puntos_base + bonus_racha
-
-
-    #.append: poner otro dato al final de historial_puntos
-    historial_puntos.append([total, True, sec]) 
+    matrizdataUsuarios[indice][1]+= puntos_base
+    matrizdataUsuarios[indice][2]+= 1
+    matrizdataUsuarios[indice][3] += 1
+    #.append: poner otro dato al final de historial_puntos 
 
     print(f"\n   Puntos base:    +{puntos_base}")
-    print(f"   Bonus racha:    +{bonus_racha}")
-    print(f"   Total ganado:   +{total}")
-    print(f"   Total acumulado: {total}")
-    print(f"   Racha actual:    {racha_actual} dias")   
-
-    return total  
+    print(f"   Total acumulado: {matrizdataUsuarios[indice][1]}")
+    print(f"   Racha actual:    {matrizdataUsuarios[indice][2]} dias")   
+ 
 
 
-def penalizacion():
+def penalizacion(nombre):
     indice = buscar_usuario(nombre)
     if indice == -1: return 0
 
@@ -195,13 +164,14 @@ def penalizacion():
     if penalizacion > puntos_actuales:
         penalizacion = puntos_actuales
 
-    historial_puntos.append([-penalizacion, False, 0]) 
+    matrizdataUsuarios[indice][1] -=penalizacion
+
+    matrizdataUsuarios[indice][2]=0
+    matrizdataUsuarios[indice][4]+=1
 
     print(f"\n   Penalizacion:    -{penalizacion} puntos")
     print(f"   Puntos totales:  {matrizdataUsuarios[indice][1]}")
-    print(f"   Racha reiniciada a 0.")
-
-    return penalizacion                             
+    print(f"   Racha reiniciada a 0.")                             
 
 
 def nivel_actual(nombre): 
@@ -255,10 +225,6 @@ matrizdataUsuarios=[
     ["Camilo", 195, 3, 7 , 4],
     ["Maria J", 120, 1, 4, 5]]
 
-#Usuario, minutos, puntos, exitosa True False
-MatrizHistorialSesiones=[] #Matriz vacia que va a ir creciendo
-
-
 def buscar_usuario(nombre):
     for i in range(len(matrizdataUsuarios)):
         nombreUsuario= matrizdataUsuarios[i][0]
@@ -267,38 +233,9 @@ def buscar_usuario(nombre):
         
     return -1
 
-def registro_sesion(nombre, minutos, puntos, exito):
-    
-    #Agregar un arreglo de nueva sesion al historialSesiones 
-    nueva_sesion=[nombre, minutos, puntos, exito ]
-    MatrizHistorialSesiones.append(nueva_sesion)
-
-    indice=buscar_usuario(nombre) #Buscar si el usuario existe
-
-    if indice==-1: #La funcion buscar_Usuario devuelve un -1, lo que significa que busco en matrizDataUsuarios y no encontro el nombre 
-        print("Usuario no encontrado")
-        registro_nuevo_usuario(nombre, 0, 0, 0, 0)
-
-    ##Actualizar la fila del usuario en la matrizDataUsuarios (puntos)
-    matrizdataUsuarios[indice][1]= matrizdataUsuarios[indice][1] + puntos
-
-
-    if exito==True:
-        #(racha)
-        matrizdataUsuarios[indice][2]=matrizdataUsuarios[indice][2]+ 1
-        #(Sesiones ok)
-        matrizdataUsuarios[indice][3]=matrizdataUsuarios[indice][3]+ 1
-        #Mensaje racha
-        mensaje_racha(matrizdataUsuarios[indice][2])
-    else:
-        #(Reinciar racha)
-        matrizdataUsuarios[indice][2]=0
-        #(Sesiones Fallidas)
-        matrizdataUsuarios[indice][4]=matrizdataUsuarios[indice][4]+ 1
-
 
 def registro_nuevo_usuario(nombre, puntos, racha, sesiones_ok,sesiones_fallo):
-    nuevo_usuario=[nombre,puntos,racha,sesiones_ok, sesiones_fallo]
+    nuevo_usuario=[nombre,puntos, racha, sesiones_ok,sesiones_fallo]
     matrizdataUsuarios.append(nuevo_usuario)
 
 def mostrar_perfil(nombre):
@@ -323,10 +260,6 @@ def mostrar_perfil(nombre):
     #Mirar
     totalpuntos = 0
     ContadorSesiones = 0
-    for sesion in MatrizHistorialSesiones:
-        if sesion[0].lower() == nombre.lower() and sesion[3] and sesion[2] > 0:
-            totalpuntos += sesion[2]
-            ContadorSesiones += 1
     promedio = round(totalpuntos / ContadorSesiones, 1) if ContadorSesiones > 0 else 0.0
 
     #Mostrar al usuario
@@ -425,69 +358,76 @@ activo= True                             # Variable de control del WHILE
 while activo:
     mostrar_menu(nombre)
     opcion=int(input("Elige tu opcion: "))
+    menu=0
         # SWITCH / MATCH / CASE - una rama por opcion
     match opcion:
         case 1:
-            print("=====SESIONES=====")
-            guardian=input("Escribe el nombre de tu guardian: ")
-            menu=int(input("Cuantos minutos quiere estar concentrado\n  1. 25 min (+20 pts)\n  2. 50 min (+45 pts)\n  3. 90 min (+80 pts)\n  4. 120 min (+120 pts)\n  5.Personalizar\n"))
+             while menu!=6:
+                print("=====SESIONES=====")
+                guardian=input("Escribe el nombre de tu guardian: ")
+                menu=int(input("Cuantos minutos quiere estar concentrado\n  1. 25 min (+20 pts)\n  2. 50 min (+45 pts)\n  3. 90 min (+80 pts)\n  4. 120 min (+120 pts)\n  5.Personalizar\n  6.Salir\n"))
 
-#menu con todas las opciones del temporizador dependiendo de lo que escoge el usuario, se rescriben las variables para la funcion temporizador
-            match menu:
-                case 1:
-                    min=25
-                    sec=0
-                    timer=min*60+sec
-                    min=timer//60
-                    sec=timer-(min*60)
-                    contraseña=iniciar_sesion_clave(timer, guardian)
-                    print(contraseña)
-                    acabo = temporizador(timer, min, sec, contraseña, nombre)
-                    if acabo==True:
-                        points=puntos(timer)
-                        registro_sesion(nombre,min,puntos,0)
-                        
-                case 2:
-                    min=50
-                    sec=0
-                    timer=min*60+sec
-                    min=timer//60
-                    sec=timer-(min*60)
-                    contraseña=iniciar_sesion_clave(timer, guardian)
-                    acabo = temporizador(timer, min, sec, contraseña, nombre)
-                    if acabo==True:
-                        points=puntos(timer)
-                case 3:
-                    min=90
-                    sec=0
-                    timer=min*60+sec
-                    min=timer//60
-                    sec=timer-(min*60)
-                    contraseña=iniciar_sesion_clave(timer, guardian)
-                    acabo = temporizador(timer, min, sec, contraseña, nombre)
-                    if acabo==True:
-                        points=puntos(timer)
-                case 4:
-                    min=120
-                    sec=0
-                    timer=min*60+sec
-                    min=timer//60
-                    sec=timer-(min*60)
-                    contraseña=iniciar_sesion_clave(timer, guardian)
-                    acabo = temporizador(timer, min, sec, contraseña, nombre)
-                    if acabo==True:
-                        points=puntos(timer)
-                case 5:
-                    min=int(input("Cuantos minutos quiere estar concentrado?: "))
-                    sec=int(input("Cuantos segundos?: "))
-                    timer=min*60+sec
-                    contraseña=iniciar_sesion_clave(timer, guardian)
-                    print(contraseña)
-                    acabo = temporizador(timer, min, sec, contraseña, nombre)
-                    if acabo:
-                        points = puntos(timer, nombre)
-                        registro_sesion(nombre, min, points, True)
-
+#menu con todas las opciones del temporizador dependiendo de lo que escoge el usuario, se rescriben las variables para la funcion temporizador 
+                match menu:
+                    case 1:
+                        timer=1500
+                        contraseña=generar_clave()
+                        print(contraseña)
+                        acabo = temporizador(timer, contraseña, nombre)
+                        if acabo==True:
+                            points=puntos(timer)
+                        print("="*42)
+                        opcion=int(input("          QUIERES SEGUIR ESTUDIANDO?: \n  1.Si\n  2.No\n"))
+                        if opcion==2:
+                            menu=6                       
+                    case 2:
+                        timer=3000
+                        contraseña=generar_clave()
+                        acabo = temporizador(timer, contraseña, nombre)
+                        if acabo==True:
+                            points=puntos(timer)
+                        print("="*42)
+                        opcion=int(input("          QUIERES SEGUIR ESTUDIANDO?: \n  1.Si\n  2.No\n"))
+                        if opcion==2:
+                            menu=6
+                    case 3:
+                        timer=5400
+                        contraseña=generar_clave()
+                        acabo = temporizador(time, contraseña, nombre)
+                        if acabo==True:
+                            points=puntos(timer)
+                        opcion=int(input("Quieres seguir estudiando?: \n  1.Si\n  2.No\n"))
+                        print("="*42)
+                        opcion=int(input("          QUIERES SEGUIR ESTUDIANDO?: \n  1.Si\n  2.No\n"))
+                        if opcion==2:
+                            menu=6
+                    case 4:
+                        timer=7200
+                        contraseña=generar_clave()
+                        acabo = temporizador(timer, contraseña, nombre)
+                        if acabo==True:
+                            points=puntos(timer)
+                        print("="*42)
+                        opcion=int(input("          QUIERES SEGUIR ESTUDIANDO?: \n  1.Si\n  2.No\n"))
+                        if opcion==2:
+                            menu=6
+                    case 5:
+                        min=int(input("Cuantos minutos quiere estar concentrado?: "))
+                        sec=int(input("Cuantos segundos?: "))
+                        timer=min*60+sec
+                        contraseña=generar_clave()
+                        print(contraseña)
+                        acabo = temporizador(timer, contraseña, nombre)
+                        if acabo:
+                            points = puntos(timer, nombre)
+                        print("="*42)
+                        opcion=int(input("          QUIERES SEGUIR ESTUDIANDO?: \n  1.Si\n  2.No\n"))
+                        if opcion==2:
+                            menu=6
+                    case 6:
+                        print("Hasta la próxima")
+                    case _:
+                        print("Opcion invalida. Vuelva a intentarlo")
 
         case 2:
             ranking()
@@ -506,11 +446,19 @@ while activo:
                 print("Usuario no encontrado")
                 print()
                 registro=input("Desea ingresar un nuevo usuario Si/No: ")
-                if registro.lower()=="Si":
+                if registro=="Si" or registro=="si":
                     registro_nuevo_usuario(nombre,0,0,0,0)
-                else:
-                    print(f"Bienvenido de vuelta {nombre} ")
-            if buscar_usuario(nombre)!=-1:
+                    print(f"Deacuerdo bienvenido {nombre}")
+                mostrar=input("Desea ver la matriz de usuarios Si/No \n Opcion: ")
+                if mostrar=="Si"or mostrar=="si":
+                    print(f"{'USUARIO':<12} {'PUNTOS':<12} {'RACHA':<12} {'SES. OK':<12} {'SES. FALLO':<12}")
+                    for i in range(len(matrizdataUsuarios)):
+                        for j in range(len(matrizdataUsuarios[i])):
+                            print(f"{matrizdataUsuarios[i][j]:<12}", end=" ")
+                        print()
+                    print("="*42)
+
+            elif buscar_usuario(nombre)!=-1:
                 print(f"Deacuerdo bienvenido {nombre}")
                 mostrar=input("Desea ver la matriz de usuarios Si/No \n Opcion: ")
                 if mostrar=="Si"or mostrar=="si":
@@ -527,5 +475,3 @@ while activo:
             print("\n   Hasta la proxima sesion. Sigue enfocado!")
         case _:
             print("   Opcion invalida. Intenta de nuevo.")
-
-    
