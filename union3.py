@@ -20,16 +20,14 @@ def generar_clave():
 
 def verificar_clave(clave): 
     global intentos
-    if len(clave)!=6:
-        return False
-    intentos+=1
     if intentos<=len(MENSAJES_ERROR):
         print(f"   {MENSAJES_ERROR[intentos - 1]}")
-    return False
+    
 
 
 ###### temporizador#####
 def temporizador(timer,contraseña,nombre):
+    global intentos
     Frases=["Empezando. Tu guardian tiene la clave","Buen comienzo! Ya completaste el 25%.","A la mitad! Sigue asi.","Casi listo! Solo falta el 25%.","Ultimo tramo! No pares ahora.","Sesion completada. Excelente trabajo!"]
     inicio=timer
     print("\nPresiona 'ESC' para salir e ingresar contraseña...")
@@ -75,18 +73,17 @@ def temporizador(timer,contraseña,nombre):
                         if clave == contraseña:
                             print("Contraseña correcta. Sesión terminada.")
                             penalizacion(nombre)
-                            return
+                            return #Estudiar por qué funciona con return y no con break
                         else:
+                            intentos+=1
                             verificar_clave(clave)
+                            
         
             time.sleep(0.1) 
             
         timer -= 1
     print("\n\nTiempo agotado!")
     return True
-
-
-
 
 #####Puntos###########
 #matriz que va aumentando
@@ -187,7 +184,7 @@ def nivel_actual(nombre):
 def nivel(nombre):
     indice = buscar_usuario(nombre)
     if indice == -1: 
-        return
+        return 0
     puntos_u = matrizdataUsuarios[indice][1]
     nivel = nivel_actual(nombre)
     nombre_nivel = nivel[0]
@@ -199,15 +196,6 @@ def nivel(nombre):
     print(f"\n   {emoji} Nivel actual: {nombre_nivel}")
     print(f"   Puntos: {puntos_u} | Faltan {falta} para el siguiente nivel")
 
-
-
-def mensaje_racha(racha):
-    mensaje_actual = ""
-    for item in Mensajes_racha: 
-        if racha >= item[0]:
-            mensaje_actual = item[1]
-    if mensaje_actual != "":
-        print(f"  {mensaje_actual}")
 
 #####usuarioo####
 
@@ -345,7 +333,7 @@ if buscar_usuario(nombre) == -1:
         registro_nuevo_usuario(nombre,0,0,0,0)
         print(f"Registro exitoso {nombre}")
     else:
-        print("Deacuerdo, no se hara registro ")
+        print("De acuerdo, no se hara registro ")
 
 
 activo= True                             # Variable de control del WHILE
@@ -359,6 +347,7 @@ while activo:
     match opcion:
         case 1:
              while menu!=6:
+                intentos=0
                 print("=====SESIONES=====")
                 guardian=input("Escribe el nombre de tu guardian: ")
                 menu=int(input("Cuantos minutos quiere estar concentrado\n  1. 25 min (+20 pts)\n  2. 50 min (+45 pts)\n  3. 90 min (+80 pts)\n  4. 120 min (+120 pts)\n  5.Personalizar\n  6.Salir\n"))
@@ -443,7 +432,7 @@ while activo:
                 registro=input("Desea ingresar un nuevo usuario Si/No: ")
                 if registro=="Si" or registro=="si":
                     registro_nuevo_usuario(nombre,0,0,0,0)
-                    print(f"Deacuerdo bienvenido {nombre}")
+                    print(f"De acuerdo bienvenido {nombre}")
                 mostrar=input("Desea ver la matriz de usuarios Si/No \n Opcion: ")
                 if mostrar=="Si"or mostrar=="si":
                     print(f"{'USUARIO':<12} {'PUNTOS':<12} {'RACHA':<12} {'SES. OK':<12} {'SES. FALLO':<12}")
