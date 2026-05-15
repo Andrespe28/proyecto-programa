@@ -4,9 +4,9 @@ import random
 import time
 import msvcrt
 
-intentos=0
-#Variable contante de intentos
-MENSAJES_ERROR = [
+intentos=0 #Variable contante de intentos
+
+MENSAJES_ERROR = [  #Arreglo mensajes de error
     "Clave incorrecta. Te quedan 2 intentos.",
     "Clave incorrecta. Te queda 1 intento.",
     "Clave incorrecta. No te quedan intentos. Sesion bloqueada."
@@ -141,7 +141,7 @@ def puntos(sec,nombre):
     matrizdataUsuarios[indice][1]+= puntos_base
     matrizdataUsuarios[indice][2]+= 1
     matrizdataUsuarios[indice][3] += 1
-    #.append: poner otro dato al final de historial_puntos 
+
 
     print(f"\n   Puntos base:    +{puntos_base}")
     print(f"   Total acumulado: {matrizdataUsuarios[indice][1]}")
@@ -151,7 +151,8 @@ def puntos(sec,nombre):
 
 def penalizacion(nombre):
     indice = buscar_usuario(nombre)
-    if indice == -1: return 0
+    if indice == -1:
+        return 0
 
     puntos_actuales = matrizdataUsuarios[indice][1]
     penalizacion = puntos_actuales // 10
@@ -192,7 +193,8 @@ def nivel_actual(nombre):
 
 def nivel(nombre):
     indice = buscar_usuario(nombre)
-    if indice == -1: return
+    if indice == -1: 
+        return
     puntos_u = matrizdataUsuarios[indice][1]
     nivel = nivel_actual(nombre)
     nombre_nivel = nivel[0]
@@ -302,7 +304,8 @@ OPCIONES_MENU= [
     "2. Ver ranking semanal",
     "3. Ver mi perfil",
     "4. Cambiar usuario",
-    "5. Salir"
+    "5. Ver tabla",
+    "6. Salir"
 ]
 
 
@@ -375,20 +378,20 @@ while activo:
                         print(contraseña)
                         acabo = temporizador(timer, contraseña, nombre)
                         if acabo==True:
-                            points=puntos(timer)
+                            points=puntos(timer,nombre)
                         print("="*42)
-                        opcion=int(input("          QUIERES SEGUIR ESTUDIANDO?: \n  1.Si\n  2.No\n"))
-                        if opcion==2:
+                        opcion=input("          QUIERES SEGUIR ESTUDIANDO?:Si/No \n")
+                        if opcion=="No" or opcion=="no":
                             menu=6                       
                     case 2:
                         timer=3000
                         contraseña=generar_clave()
                         acabo = temporizador(timer, contraseña, nombre)
                         if acabo==True:
-                            points=puntos(timer)
+                            points=puntos(timer, nombre)
                         print("="*42)
-                        opcion=int(input("          QUIERES SEGUIR ESTUDIANDO?: \n  1.Si\n  2.No\n"))
-                        if opcion==2:
+                        opcion=input("          QUIERES SEGUIR ESTUDIANDO?:Si/No \n")
+                        if opcion=="No" or opcion=="no":
                             menu=6
                     case 3:
                         timer=5400
@@ -396,20 +399,19 @@ while activo:
                         acabo = temporizador(time, contraseña, nombre)
                         if acabo==True:
                             points=puntos(timer)
-                        opcion=int(input("Quieres seguir estudiando?: \n  1.Si\n  2.No\n"))
                         print("="*42)
-                        opcion=int(input("          QUIERES SEGUIR ESTUDIANDO?: \n  1.Si\n  2.No\n"))
-                        if opcion==2:
+                        opcion=input("          QUIERES SEGUIR ESTUDIANDO?:Si/No \n")
+                        if opcion=="No" or opcion=="no":
                             menu=6
                     case 4:
                         timer=7200
                         contraseña=generar_clave()
                         acabo = temporizador(timer, contraseña, nombre)
                         if acabo==True:
-                            points=puntos(timer)
+                            points=puntos(timer, nombre)
                         print("="*42)
-                        opcion=int(input("          QUIERES SEGUIR ESTUDIANDO?: \n  1.Si\n  2.No\n"))
-                        if opcion==2:
+                        opcion=input("          QUIERES SEGUIR ESTUDIANDO?:Si/No \n")
+                        if opcion=="No" or opcion=="no":
                             menu=6
                     case 5:
                         min=int(input("Cuantos minutos quiere estar concentrado?: "))
@@ -421,8 +423,8 @@ while activo:
                         if acabo:
                             points = puntos(timer, nombre)
                         print("="*42)
-                        opcion=int(input("          QUIERES SEGUIR ESTUDIANDO?: \n  1.Si\n  2.No\n"))
-                        if opcion==2:
+                        opcion=input("          QUIERES SEGUIR ESTUDIANDO?:Si/No \n")
+                        if opcion=="No" or opcion=="no":
                             menu=6
                     case 6:
                         print("Hasta la próxima")
@@ -468,9 +470,16 @@ while activo:
                             print(f"{matrizdataUsuarios[i][j]:<12}", end=" ")
                         print()
                     print("="*42)
+        case 5:
+            print(f"{'USUARIO':<12} {'PUNTOS':<12} {'RACHA':<12} {'SES. OK':<12} {'SES. FALLO':<12}")
+            for i in range(len(matrizdataUsuarios)):
+                for j in range(len(matrizdataUsuarios[i])):
+                    print(f"{matrizdataUsuarios[i][j]:<12}", end=" ")
+                print()
+            print("="*42)
 
                 
-        case 5:
+        case 6:
             activo = False                      # Sale del WHILE
             print("\n   Hasta la proxima sesion. Sigue enfocado!")
         case _:
