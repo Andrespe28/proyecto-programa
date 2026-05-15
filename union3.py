@@ -101,16 +101,9 @@ niveles = [
     ["Maestro",     2000, 9999, "👑"]
 ]
 
-#matriz con pos 1: tiempo, pos 2: puntos y pos 3: bonus si tiene racha
-tabla_puntos = [
-    [25,  20,  5],  
-    [50,  45,  10],
-    [90,  80,  20],
-    [120, 120, 30]
-]
 
 #mensajes por racha
-Mmensajes_racha = [
+Mensajes_racha = [
     [1,  "Buen inicio de racha!"],
     [3,  "3 dias seguidos. Vas bien!"],
     [7,  "Una semana completa. Increible!"],
@@ -210,7 +203,7 @@ def nivel(nombre):
 
 def mensaje_racha(racha):
     mensaje_actual = ""
-    for item in Mmensajes_racha: 
+    for item in Mensajes_racha: 
         if racha >= item[0]:
             mensaje_actual = item[1]
     if mensaje_actual != "":
@@ -434,7 +427,7 @@ while activo:
         case 2:
             ranking()
         case 3:
-            lol=int(input("Quieres ver un resumen o ver tu nivel?: \n  1.Resumen\n  2.Nivel\n"))
+            lol=int(input("Quieres ver un resumen o ver tu nivel?: \n  1.Resumen\n  2.Nivel\n Opcion: "))
             match lol:
                 case 1:
                     mostrar_perfil(nombre)
