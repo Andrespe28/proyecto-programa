@@ -12,7 +12,7 @@ MENSAJES_ERROR = [  #Arreglo mensajes de error
     "Clave incorrecta. No te quedan intentos. Sesion bloqueada."
 ]
 
-#FUNCION QUE GENERA CLAVE 
+#FUNCION QUE GENERA CLAVE DE 6 DIGITOS
 def generar_clave():
     numero=random.randint(100000,999999) #Genera un numero de 6 digitos entre el rango (a,b) 
     clave=str(numero) #Clave en str para compararla con la que ingrese el usuario(tambien podria se un int)
