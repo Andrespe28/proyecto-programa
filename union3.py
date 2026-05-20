@@ -232,8 +232,8 @@ def mostrar_perfil(nombre):#Recibe nombre del usuario
         tasa=0.0
     #promedio local usuario
     #Mirar
-    totalpuntos = 0
-    ContadorSesiones = 0
+    totalpuntos = PuntosU
+    ContadorSesiones = totalSesiones
     promedio = round(totalpuntos / ContadorSesiones, 1) if ContadorSesiones > 0 else 0.0
 
     #Mostrar al usuario
