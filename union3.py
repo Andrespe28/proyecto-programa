@@ -232,9 +232,9 @@ def mostrar_perfil(nombre):#Recibe nombre del usuario
         tasa=0.0
     #promedio local usuario
     #Mirar
-    totalpuntos = 0
-    ContadorSesiones = 0
-    promedio = round(totalpuntos / ContadorSesiones, 1) if ContadorSesiones > 0 else 0.0
+    totalpuntos = PuntosU
+    ContadorSesiones = totalSesiones
+    promedio = round(totalpuntos / ContadorSesiones,1) 
 
     #Mostrar al usuario
     nivel = nivel_actual(nombre)
@@ -246,7 +246,7 @@ def mostrar_perfil(nombre):#Recibe nombre del usuario
     print(f"   Racha actual:       {RachaU} dias")
     print(f"   Sesiones ok:        {SesionesOkU}")
     print(f"   Sesiones fallidas:  {SesionesFallidasU}")
-    print(f"   Promedio puntos:    {promedio}")
+    print(f"   Promedio P/S:    {promedio}")
     print(f"   Tasa de exito:      {tasa:3.1f}%")
     print("=" * 42)
 
