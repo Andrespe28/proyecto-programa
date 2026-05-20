@@ -234,7 +234,7 @@ def mostrar_perfil(nombre):#Recibe nombre del usuario
     #Mirar
     totalpuntos = PuntosU
     ContadorSesiones = totalSesiones
-    promedio = round(totalpuntos / ContadorSesiones,1) 
+    promedio = round(totalpuntos / ContadorSesiones, 1) if ContadorSesiones > 0 else 0.0
 
     #Mostrar al usuario
     nivel = nivel_actual(nombre)
@@ -283,7 +283,7 @@ def mostrar_menu(nombre):#Recibe nombre del usuario
     if indice==-1: #No existe
         return 0
     print("\n" + "=" * 42)
-    print("   GRINDLOCK - Sin distracciones.")
+    print("   KRYPTONITE - Sin distracciones.")
     print("=" * 42)
     if indice!=-1:
         print(f"   Usuario actual: {matrizdataUsuarios[indice][0]}")
@@ -301,7 +301,7 @@ def mostrar_menu(nombre):#Recibe nombre del usuario
 
 ## Imprimir MatrizDataUsuarios 
 print("\n" + "=" * 42)
-print("   Bienvenido a GRINDLOCK")
+print("   Bienvenido a KRYPTONITE")
 print("=" * 42)
 print(f"{'USUARIO':<12} {'PUNTOS':<12} {'RACHA':<12} {'SES. OK':<12} {'SES. FALLO':<12}")
 
