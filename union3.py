@@ -5,7 +5,7 @@ import time     ##Importar libreria para controlar el tiempo y pausar el program
 import msvcrt   ##Importar libreria (Sistemas Windows) detecta teclas al instante
 
 intentos = 0 #Variable contante de intentos disponibles al ingresar la clave correcta
-
+print("Hola")
 MENSAJES_ERROR = [  #Arreglo mensajes de error
     "Clave incorrecta. Te quedan 2 intentos.",
     "Clave incorrecta. Te queda 1 intento.",
