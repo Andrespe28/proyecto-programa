@@ -195,7 +195,7 @@ def nivel(nombre):
 matrizdataUsuarios=[
     ["Maria P", 120, 9, 14, 2],
     ["Andres", 0, 0, 0, 0 ],
-    ["Valeria", 190, 5, 9, 3],
+    ["Valeria", 280, 5, 9, 3],
     ["Camilo", 195, 3, 7 , 4],
     ["Maria J", 120, 1, 4, 5]]
 
@@ -255,9 +255,17 @@ def ranking():
     matrizRanking = list(matrizdataUsuarios) #Crea una copia de la matrizdataUsuarios para trabajar con esta y efectuar cambios, sin dañar la original
     n=len(matrizRanking)
     for i in range(n):
-        for j in range(0,n-i-1): #Algoritmo burbuja --> Compara usuarios consecutivos y si estan en orden incorrecto los intercala, asi hasta que todos esten ordenados de mayor a menor, si un usuario ya esta organizado, no se toca mas, por ello el n-i-1
-            if matrizRanking[j][1]< matrizRanking[j+1][1]:
-                matrizRanking[j], matrizRanking[j+1] = matrizRanking[j+1], matrizRanking[j] #Intercambiando cada fila, cambiando columna nombres, y columna puntos
+        max=i
+        for j in range(i+1, n):
+            if matrizRanking[j][1]>matrizRanking[max][1]:
+                max=j
+        matrizRanking[i], matrizRanking[max]= matrizRanking[max], matrizRanking[i]
+
+   ## n=len(matrizRanking)
+    ##for i in range(n):
+      ##  for j in range(0,n-i-1): #Algoritmo burbuja --> Compara usuarios consecutivos y si estan en orden incorrecto los intercala, asi hasta que todos esten ordenados de mayor a menor, si un usuario ya esta organizado, no se toca mas, por ello el n-i-1
+        ##    if matrizRanking[j][1]< matrizRanking[j+1][1]:
+          ##      matrizRanking[j], matrizRanking[j+1] = matrizRanking[j+1], matrizRanking[j] #Intercambiando cada fila, cambiando columna nombres, y columna puntos
 
     print("Ranking final ")
     for fila in matrizRanking:
