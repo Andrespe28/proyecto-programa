@@ -165,12 +165,11 @@ def nivel_actual(nombre):
         puntos_u = 0                              # Si no existe, ponle 0 puntos
     nivel_encontrado = niveles[0]
 
-    for colum in niveles: ##Recorre la matriz niveles fila por fila
-        if puntos_u >= colum[1] and puntos_u <= colum[2]:
-            nivel_encontrado = colum
+    for fila in niveles: ##Recorre la matriz niveles fila por fila
+        if puntos_u >= fila[1] and puntos_u <= fila[2]:
+            nivel_encontrado = fila
             break
     return nivel_encontrado
-
 
 def nivel(nombre):
     indice = buscar_usuario(nombre)#Saber si el usuario existe
